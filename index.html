@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>iPhone Service Hub | iCloud & Unlock Solutions</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    :root {
+      --main-bg: #5299b5;
+      --accent: #0071e3;
+      --text-dark: #11636c;
+      --text-light: #163c53;
+      --card-bg: #fff;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--main-bg);
+      color: var(--text-dark);
+    }
+
+    /* Loader Styles */
+    .loader-wrapper {
+      position: fixed;
+      width: 100vw;
+      height: 100vh;
+      background: #050225;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+    }
+
+    .cube {
+      width: 60px;
+      height: 60px;
+      background: var(--accent);
+      animation: rotateCube 1.2s linear infinite;
+      border-radius: 12px;
+    }
+
+    @keyframes rotateCube {
+      0%   { transform: rotateX(0deg) rotateY(0deg); }
+      100% { transform: rotateX(360deg) rotateY(360deg); }
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    header {
+      background: #fff;
+      padding: 1.2em 2em;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    header h1 {
+      font-size: 1.5em;
+      color: var(--accent);
+    }
+
+    nav ul {
+      display: flex;
+      gap: 1.5em;
+      flex-wrap: wrap;
+    }
+
+    nav ul li {
+      list-style: none;
+    }
+
+    nav ul li a {
+      text-decoration: none;
+      color: var(--text-dark);
+      font-weight: 500;
+      transition: color 0.3s ease;
+    }
+
+    nav ul li a:hover {
+      color: var(--accent);
+    }
+
+    .hero {
+      padding: 5em 2em;
+      text-align: center;
+      background: #f2f4f7;
+    }
+
+    .hero h2 {
+      font-size: 2.8em;
+      margin-bottom: 0.5em;
+    }
+
+    .hero p {
+      font-size: 1.2em;
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto 1.5em auto;
+    }
+
+    .hero .btn {
+      padding: 0.8em 1.8em;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.3s ease;
+    }
+
+    .hero .btn:hover {
+      background: #005bb5;
+    }
+
+    .services {
+      padding: 4em 2em;
+      background: #fff;
+      text-align: center;
+    }
+
+    .services h3 {
+      font-size: 2em;
+      margin-bottom: 2em;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 2em;
+    }
+
+    .service-card {
+      background: var(--card-bg);
+      padding: 2em;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      text-align: left;
+    }
+
+    .service-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .service-card h4 {
+      margin-bottom: 0.5em;
+      color: var(--accent);
+    }
+
+    .service-card p {
+      color: var(--text-light);
+      font-size: 0.95em;
+    }
+
+    footer {
+      background: #0a073c;
+      color: #bfcde4;
+      padding: 3em 2em;
+      font-size: 0.9em;
+    }
+
+    footer h2, footer h3 {
+      color: #fff;
+    }
+
+    footer a {
+      color: #1da1f2;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav ul {
+        flex-direction: column;
+        width: 100%;
+        margin-top: 1em;
+        gap: 0.5em;
+      }
+
+      .hero h2 {
+        font-size: 2em;
+      }
+
+      .hero p {
+        font-size: 1em;
+        padding: 0 1em;
+      }
+
+      .hero .btn {
+        padding: 0.8em 1.2em;
+        font-size: 0.95em;
+      }
+
+      .services {
+        padding: 2em 1em;
+      }
+
+      .service-card {
+        padding: 1.5em;
+      }
+
+      footer {
+        font-size: 0.85em;
+        padding: 2em 1em;
+      }
+
+      footer div[style*="display: flex"] {
+        flex-direction: column;
+        gap: 2em;
+      }
+
+      .cube {
+        width: 50px;
+        height: 50px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Loader -->
+  <div class="loader-wrapper" id="loader">
+    <div class="cube"></div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content hidden">
+    <header>
+      <h1>iPhone Service Hub</h1>
+      <nav>
+        <ul>
+          <li><a href="services.html">Services</a></li>
+          <li><a href="review.html">Reviews</a></li>
+          <li><a href="track.html">Tracking</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <h2>Trusted iCloud & Unlock Services</h2>
+      <p>We specialize in secure iPhone solutions including iCloud unlocks, recovery, jailbreaks, and network unlocks.</p>
+      <a class="btn" href="services.html">Explore Services</a>
+    </section>
+
+    <section class="services">
+      <h3>Our Services</h3>
+      <div class="service-grid">
+        <div class="service-card"><h4>iCloud Recovery</h4><p>Recover access to your iCloud account using secure and verified tools.</p></div>
+        <div class="service-card"><h4>iCloud Unlock</h4><p>Remove iCloud lock from eligible devices with proof of ownership.</p></div>
+        <div class="service-card"><h4>iCloud Bypass</h4><p>Specialized bypass solutions for locked Apple devices (with proof).</p></div>
+        <div class="service-card"><h4>AT&T Services</h4><p>Unlock AT&T devices, check blacklist status, and request clean removal.</p></div>
+        <div class="service-card"><h4>Carrier Unlock</h4><p>Unlock iPhones from all major mobile networks permanently and safely.</p></div>
+        <div class="service-card"><h4>Blacklist Removal</h4><p>Remove your iPhone from GSMA blacklists if eligible and verifiable.</p></div>
+        <div class="service-card"><h4>iOS Jailbreak</h4><p>Expert jailbreak assistance and safe un-jailbreak help.</p></div>
+        <div class="service-card"><h4>Apple ID Removal</h4><p>Remove inactive or lost Apple IDs from devices with secure methods.</p></div>
+      </div>
+    </section>
+
+    <footer>
+      <div style="max-width: 1200px; margin: auto;">
+        <div style="display: flex; flex-wrap: wrap; gap: 2em; justify-content: space-between; align-items: flex-start;">
+          <div style="flex: 1; min-width: 240px;">
+            <h2>iPhone Service Hub</h2>
+            <p>Reliable iCloud & iPhone unlock solutions since 2021. Trusted by clients worldwide for secure, fast services.</p>
+            <p style="margin-top: 1em;">&copy; 2025 iPhone Service Hub. All rights reserved.</p>
+          </div>
+          <div style="flex: 1; min-width: 240px;">
+            <h3>Supported & Trusted by</h3>
+            <div style="display: flex; flex-wrap: wrap; gap: 2em; font-size: 2em; color: #fff; align-items: center;">
+              <a href="https://developer.apple.com/" target="_blank" style="text-decoration: none; color: #fff; display: flex; flex-direction: column; align-items: center;">
+                <i class="fab fa-apple"></i>
+                <small>Apple Dev</small>
+              </a>
+              <a href="https://www.att.com/deviceunlock/" target="_blank" style="text-decoration: none; color: #fff; display: flex; flex-direction: column; align-items: center;">
+                <i class="fas fa-signal"></i>
+                <small>AT&T</small>
+              </a>
+              <a href="https://www.gsma.com/" target="_blank" style="text-decoration: none; color: #fff; display: flex; flex-direction: column; align-items: center;">
+                <i class="fas fa-globe"></i>
+                <small>GSMA</small>
+              </a>
+            </div>
+          </div>
+          <div style="flex: 1; min-width: 240px;">
+          <div style="flex: 1; min-width: 240px; font-size: 1.1em; line-height: 1.8;">
+          <h3 style="font-size: 1.4em; margin-bottom: 1em;">Contact & Support</h3>
+
+          <p style="display: flex; align-items: center; margin-bottom: 0.8em;">
+            <i class="fas fa-envelope" style="font-size: 1.4em; color: #1da1f2; margin-right: 0.7em;"></i>
+            <a href="mailto:iphonehubcontact@gmail.com" style="color: #bfcde4; text-decoration: none;">Contact@iphonehub.com</a>
+          </p>
+
+          <p style="display: flex; align-items: center; margin-bottom: 0.8em;">
+            <i class="fab fa-whatsapp" style="font-size: 1.5em; color: #25D366; margin-right: 0.7em;"></i>
+            <a href="http://wa.me/15135692040" target="_blank" style="color: #bfcde4; text-decoration: none;">+1 (513) 569-240</a>
+          </p>
+
+          <p style="display: flex; align-items: center;">
+            <i class="fas fa-clock" style="font-size: 1.3em; color: #ffc107; margin-right: 0.7em;"></i>
+            Mon–Sat: 9:00 AM – 6:00 PM (EST)
+          </p>
+        </div>
+
+
+        </div>
+        <hr style="margin: 2em 0; border: 0; border-top: 1px solid #333;" />
+        <div style="text-align: center; font-size: 0.85em;">
+          This website is not affiliated with Apple Inc. All trademarks are property of their respective owners. Services offered are 100% legal and based on proof of ownership.
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    window.addEventListener("load", () => {
+      const loader = document.getElementById("loader");
+      const content = document.querySelector(".main-content");
+
+      setTimeout(() => {
+        loader.style.display = "none";
+        content.classList.remove("hidden");
+      }, 2000); // 2 seconds
+    });
+  </script>
+</body>
+</html>

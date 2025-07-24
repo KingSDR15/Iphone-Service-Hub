@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Track Your Order</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #336e87, #394c53, #6391a5);
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+    padding: 1em;
+    box-sizing: border-box;
+  }
+
+  .loader {
+    width: 80px; height: 80px;
+    border: 10px solid rgba(255, 255, 255, 0.2);
+    border-top: 10px solid #00c3ff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 2em auto;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 5vw, 2.2rem);
+    color: #00c3ff;
+    text-align: center;
+  }
+
+  #trackForm {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1em;
+    margin-top: 1em;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  input[type="text"] {
+    flex: 1 1 100%;
+    padding: 0.8em 1em;
+    font-size: 1rem;
+    border: none;
+    border-radius: 6px;
+    max-width: 100%;
+  }
+
+  button {
+    flex: 1 1 100%;
+    padding: 0.8em;
+    font-size: 1rem;
+    background: #00c3ff;
+    border: none;
+    border-radius: 6px;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #009dc4;
+  }
+
+  .status-container {
+    margin-top: 2em;
+    text-align: center;
+    max-width: 90%;
+    width: 100%;
+  }
+
+  .status-step {
+    margin: 1em 0;
+    font-size: 1.1em;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.6s ease-in-out;
+  }
+
+  .status-step.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .status-step i {
+    margin-right: 0.5em;
+    color: #00ffcc;
+  }
+
+  .error {
+    color: #ff4d4d;
+    margin-top: 1em;
+    font-weight: bold;
+    font-size: 0.95em;
+  }
+
+  .back-home-btn {
+    display: inline-block;
+    margin: 1em auto 2em;
+    padding: 0.6em 1.2em;
+    background-color: #ffffff;
+    color: #0071e3;
+    font-weight: 500;
+    text-decoration: none;
+    border: 2px solid #0071e3;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+
+  .back-home-btn:hover {
+    background-color: #0071e3;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+  }
+
+  @media (min-width: 600px) {
+    #trackForm {
+      flex-wrap: nowrap;
+    }
+    input[type="text"], button {
+      flex: 1;
+      max-width: unset;
+    }
+  }
+</style>
+
+</head>
+<body>
+<a href="index.html" class="back-home-btn">← Back to Home</a>
+
+<div class="loader" id="pageLoader"></div>
+
+<h1>Track Your Order</h1>
+
+<form id="trackForm" onsubmit="startTracking(event)">
+  <input type="text" id="trackingID" placeholder="Enter your Tracking ID" required />
+  <button type="submit"><i class="fas fa-search"></i> Track</button>
+  <div class="error" id="errorMsg"></div>
+</form>
+
+<div class="status-container" id="statusContainer">
+  <div class="status-step" id="step1"><i class="fas fa-check-circle"></i> Order Received</div>
+  <div class="status-step" id="step2"><i class="fas fa-cogs"></i> Processing</div>
+  <div class="status-step" id="step3"><i class="fas fa-truck"></i> Out for Delivery</div>
+  <div class="status-step" id="step4"><i class="fas fa-box"></i> Delivered</div>
+</div>
+
+<script>
+  const validID = "8637837";
+  const steps = ["step1", "step2", "step3", "step4"];
+  const regularInterval = 30 * 60 * 1000; // 30 mins
+  const finalDelay = 24 * 60 * 60 * 1000; // 24 hours
+
+  window.onload = () => {
+    document.getElementById("pageLoader").style.display = "none";
+
+    const saved = localStorage.getItem("trackingProgress");
+    if (saved) {
+      const { id, stage, lastUpdate } = JSON.parse(saved);
+      if (id === validID) {
+        restoreTracking(stage, lastUpdate);
+      }
+    }
+  };
+
+  function startTracking(event) {
+    event.preventDefault();
+    const input = document.getElementById("trackingID").value.trim();
+    const error = document.getElementById("errorMsg");
+    error.textContent = "";
+
+    if (input !== validID) {
+      error.textContent = "Invalid Tracking ID. Please try again.";
+      return;
+    }
+
+    document.getElementById("statusContainer").style.display = "block";
+
+    const saved = localStorage.getItem("trackingProgress");
+    if (saved) {
+      const { stage, lastUpdate } = JSON.parse(saved);
+      restoreTracking(stage, lastUpdate);
+      return;
+    }
+
+    updateStatus(0);
+  }
+
+  function restoreTracking(savedStage, savedTime) {
+    document.getElementById("statusContainer").style.display = "block";
+
+    for (let i = 0; i <= savedStage; i++) {
+      document.getElementById(steps[i]).classList.add("active");
+    }
+
+    const now = Date.now();
+    const elapsed = now - savedTime;
+    const nextStage = savedStage + 1;
+
+    let delay;
+
+    if (nextStage === 3) {
+      delay = finalDelay - elapsed;
+    } else {
+      delay = regularInterval - elapsed;
+    }
+
+    if (nextStage < steps.length && delay > 0) {
+      setTimeout(() => updateStatus(nextStage), delay);
+    } else if (nextStage < steps.length) {
+      updateStatus(nextStage);
+    }
+  }
+
+  function updateStatus(stage) {
+    if (stage >= steps.length) return;
+
+    document.getElementById(steps[stage]).classList.add("active");
+
+    localStorage.setItem("trackingProgress", JSON.stringify({
+      id: validID,
+      stage: stage,
+      lastUpdate: Date.now()
+    }));
+
+    const nextStage = stage + 1;
+
+    if (nextStage < steps.length) {
+      const delay = nextStage === 3 ? finalDelay : regularInterval;
+      setTimeout(() => updateStatus(nextStage), delay);
+    }
+  }
+</script>
+
+</body>
+</html>

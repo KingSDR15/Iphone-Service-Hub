@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Customer Reviews</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f2f4f8;
+      padding: 2em;
+    }
+
+    h1 {
+      text-align: center;
+      color: #0071e3;
+      margin-bottom: 1em;
+    }
+
+    form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 1.5em;
+      border-radius: 10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 0.8em;
+      margin-top: 1em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1em;
+    }
+
+    button {
+      margin-top: 1em;
+      padding: 0.8em 1.5em;
+      background: #0071e3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 1em;
+      cursor: pointer;
+    }
+
+    .back-home-btn {
+      display: inline-block;
+      margin: 2em auto;
+      padding: 0.6em 1.4em;
+      background-color: #ffffff;
+      color: #0071e3;
+      font-weight: 500;
+      text-decoration: none;
+      border: 2px solid #0071e3;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .back-home-btn:hover {
+      background-color: #0071e3;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .error {
+      color: red;
+      margin-top: 1em;
+    }
+
+    .comments-section {
+      max-width: 800px;
+      margin: 2em auto;
+    }
+
+    .comment {
+      background: #fff;
+      padding: 1em;
+      border-left: 4px solid #0071e3;
+      margin-bottom: 1em;
+      border-radius: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+
+    .comment strong {
+      display: block;
+      color: #333;
+    }
+
+    .comment small {
+      color: #666;
+    }
+
+    .comment p {
+      margin: 0.5em 0 0 0;
+    }
+
+    @media screen and (max-width: 600px) {
+      body {
+        padding: 1em;
+      }
+
+      form, .comments-section {
+        padding: 1em;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<a href="index.html" class="back-home-btn">← Back to Home</a>
+
+<h1>What Our Customers Say</h1>
+
+<form onsubmit="submitComment(event)">
+  <input type="email" id="email" placeholder="Your Email" required />
+  <input type="text" id="trackingID" placeholder="Tracking ID" required />
+  <textarea id="comment" placeholder="Write your review here..." rows="5" required></textarea>
+  <button type="submit">Submit Comment</button>
+  <div class="error" id="errorMsg"></div>
+</form>
+
+<div class="comments-section" id="commentsContainer"></div>
+
+<!-- Load generated comments -->
+<script src="comments.js"></script>
+
+<script>
+  const allowedTrackingID = "8637837";
+
+  // Function to hide email (e.g. jo****@gmail.com)
+  function maskEmail(email) {
+    const [user, domain] = email.split("@");
+    const masked = user.length > 2 ? user.substring(0, 2) + "****" : user + "****";
+    return masked + "@" + domain;
+  }
+
+  function loadComments() {
+    const container = document.getElementById("commentsContainer");
+    container.innerHTML = "";
+
+    const localComments = JSON.parse(localStorage.getItem("userComments") || "[]");
+    const allComments = (typeof commentsData !== "undefined" ? commentsData : []).concat(localComments);
+
+    allComments.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "comment";
+      div.innerHTML = `
+        <strong>${maskEmail(c.email)}</strong>
+        ${c.date ? `<small>Date: ${c.date}</small>` : ""}
+        <p>${c.text}</p>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  function submitComment(e) {
+    e.preventDefault();
+    const email = document.getElementById("email").value.trim();
+    const tracking = document.getElementById("trackingID").value.trim();
+    const text = document.getElementById("comment").value.trim();
+    const error = document.getElementById("errorMsg");
+
+    if (!email || !tracking || !text) {
+      error.textContent = "All fields are required.";
+      return;
+    }
+
+    if (tracking !== allowedTrackingID) {
+      error.textContent = "Invalid tracking ID.";
+      return;
+    }
+
+    const newComment = {
+      email,
+      tracking,
+      text,
+      date: new Date().toLocaleDateString()
+    };
+
+    const comments = JSON.parse(localStorage.getItem("userComments") || "[]");
+    comments.push(newComment);
+    localStorage.setItem("userComments", JSON.stringify(comments));
+
+    document.getElementById("email").value = "";
+    document.getElementById("trackingID").value = "";
+    document.getElementById("comment").value = "";
+    error.textContent = "";
+
+    loadComments();
+  }
+
+  window.onload = loadComments;
+</script>
+
+</body>
+</html>
