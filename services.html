@@ -383,52 +383,60 @@
 </footer>
 
 <script>
-  let selectedService = '';
-  let selectedPrice = '';
+    let selectedService = '';
+    let selectedPrice = '';
 
-  function openForm(service, price) {
-    selectedService = service;
-    selectedPrice = price;
-    document.getElementById('serviceNameDisplay').innerText = service;
-    document.getElementById('formModal').style.display = 'flex';
-    document.getElementById('ctaButtons').style.display = 'none';
-    document.getElementById('fullName').value = '';
-    document.getElementById('email').value = '';
-    document.getElementById('imei').value = '';
-    document.getElementById('iphoneModel').value='';
-  }
+    function openForm(service, _ignoredPrice) {
+      selectedService = service;
 
-  function closeForm() {
-    document.getElementById('formModal').style.display = 'none';
-  }
+      const cards = document.querySelectorAll('.service-card');
+      cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.trim();
+        if (title === service) {
+          const priceText = card.querySelector('.price-tag').innerText.replace('$', '').trim();
+          selectedPrice = parseFloat(priceText);
+        }
+      });
 
-  function downloadForm() {
-    const name = document.getElementById('fullName').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const imei = document.getElementById('imei').value.trim();
-
-    if (!name || !email || !imei) {
-      alert("Please fill in all fields.");
-      return;
+      document.getElementById('serviceNameDisplay').innerText = service;
+      document.getElementById('formModal').style.display = 'flex';
+      document.getElementById('ctaButtons').style.display = 'none';
+      document.getElementById('fullName').value = '';
+      document.getElementById('email').value = '';
+      document.getElementById('imei').value = '';
+      document.getElementById('iphoneModel').value = '';
     }
 
-    const content = `Service Request Form\n\nService: ${selectedService}\nPrice: $${selectedPrice}\nFull Name: ${name}\nEmail: ${email}\nIMEI/Serial: ${imei}`;
-    const blob = new Blob([content], { type: "text/plain" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = `${selectedService}_Request.txt`;
-    a.click();
+    function closeForm() {
+      document.getElementById('formModal').style.display = 'none';
+    }
 
-    const message = `Hello, I need ${selectedService} service.\n\nName: ${name}\nEmail: ${email}\nIMEI/Serial: ${imei}`;
-    const waNumber = "15135692040";
-    document.getElementById("waLink").href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+    function downloadForm() {
+      const name = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const imei = document.getElementById('imei').value.trim();
 
-    const subject = `Request: ${selectedService}`;
-    const mailtoBody = `Name: ${name}%0DEmail: ${email}%0DIMEI: ${imei}%0DService: ${selectedService}`;
-    document.getElementById("emailLink").href = `mailto:iphonehubcontact@gmail.com?subject=${subject}&body=${mailtoBody}`;
+      if (!name || !email || !imei) {
+        alert("Please fill in all fields.");
+        return;
+      }
 
-    document.getElementById('ctaButtons').style.display = 'flex';
-  }
-</script>
+      const content = `Service Request Form\n\nService: ${selectedService}\nPrice: $${selectedPrice}\nFull Name: ${name}\nEmail: ${email}\nIMEI/Serial: ${imei}`;
+      const blob = new Blob([content], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${selectedService}_Request.txt`;
+      a.click();
+
+      const message = `Hello, I need ${selectedService} service.\n\nName: ${name}\nEmail: ${email}\nIMEI/Serial: ${imei}`;
+      const waNumber = "15135692040";
+      document.getElementById("waLink").href = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+
+      const subject = `Request: ${selectedService}`;
+      const mailtoBody = `Name: ${name}%0DEmail: ${email}%0DIMEI: ${imei}%0DService: ${selectedService}`;
+      document.getElementById("emailLink").href = `mailto:iphonehubcontact@gmail.com?subject=${subject}&body=${mailtoBody}`;
+
+      document.getElementById('ctaButtons').style.display = 'flex';
+    }</script>
 </body>
 </html>
